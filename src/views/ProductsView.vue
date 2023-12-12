@@ -33,7 +33,7 @@
         <td>
           <div class="btn-group">
             <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
-            <button class="btn btn-outline-danger btn-sm">刪除</button>
+            <button class="btn btn-outline-danger btn-sm" @click="openDelModal(item)">刪除</button>
           </div>
         </td>
       </tr>
@@ -42,9 +42,14 @@
   <ProductModal ref="productModal"
   :product="tempProduct"
   @update-product="updateProduct"></ProductModal>
+  <DelModal ref="delModal"
+  :item="delProduct"
+  @delete-product="deleteProduct"
+  ></DelModal>
 </template>
 <script>
 import ProductModal from '../components/ProductModal.vue'
+import DelModal from '../components/DelModal.vue'
 
 export default {
   data () {
@@ -52,11 +57,13 @@ export default {
       products: [],
       pagination: {},
       tempProduct: {},
-      isNew: false
+      isNew: false,
+      delProduct: {}
     }
   },
   components: {
-    ProductModal
+    ProductModal,
+    DelModal
   },
   methods: {
     getProducts () {
@@ -65,7 +72,6 @@ export default {
       this.$http.get(api)
         .then((res) => {
           if (res.data.success) {
-            console.log('data-->', res.data)
             this.products = res.data.products
             this.pagination = res.data.pagination
           }
@@ -80,6 +86,12 @@ export default {
       this.isNew = isNew
       const productComponent = this.$refs.productModal
       productComponent.showModal()
+    },
+    openDelModal (item) {
+      console.log('del:', item)
+      this.delProduct = { ...item }
+      const delComponent = this.$refs.delModal
+      delComponent.showModal()
     },
     updateProduct (item) {
       this.tempProduct = item
@@ -96,6 +108,18 @@ export default {
         (response) => {
           console.log(response)
           productComponent.hideModal()
+          this.getProducts()
+        }
+      )
+    },
+    deleteProduct (productId) {
+      console.log('del product', productId)
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${productId}`
+      const delComponent = this.$refs.delModal
+      this.$http.delete(api).then(
+        (response) => {
+          console.log(response)
+          delComponent.hideModal()
           this.getProducts()
         }
       )
