@@ -1,4 +1,5 @@
 <template>
+  <LoadingComponent :active="isLoading"></LoadingComponent>
   <div class="text-end">
     <button class="btn btn-primary" type="button"
     @click="openModal(true)">
@@ -50,6 +51,7 @@
 <script>
 import ProductModal from '../components/ProductModal.vue'
 import DelModal from '../components/DelModal.vue'
+import LoadingComponent from 'vue3-loading-overlay'
 
 export default {
   data () {
@@ -58,19 +60,23 @@ export default {
       pagination: {},
       tempProduct: {},
       isNew: false,
-      delProduct: {}
+      delProduct: {},
+      isLoading: false
     }
   },
   components: {
     ProductModal,
-    DelModal
+    DelModal,
+    LoadingComponent
   },
   methods: {
     getProducts () {
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products`
       console.log(api)
+      this.isLoading = true
       this.$http.get(api)
         .then((res) => {
+          this.isLoading = false
           if (res.data.success) {
             this.products = res.data.products
             this.pagination = res.data.pagination
@@ -104,8 +110,10 @@ export default {
         httpMethod = 'put'
       }
       const productComponent = this.$refs.productModal
+      this.isLoading = true
       this.$http[httpMethod](api, { data: this.tempProduct }).then(
         (response) => {
+          this.isLoading = false
           console.log(response)
           productComponent.hideModal()
           this.getProducts()
@@ -113,12 +121,12 @@ export default {
       )
     },
     deleteProduct (productId) {
-      console.log('del product', productId)
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${productId}`
       const delComponent = this.$refs.delModal
+      this.isLoading = true
       this.$http.delete(api).then(
         (response) => {
-          console.log(response)
+          this.isLoading = false
           delComponent.hideModal()
           this.getProducts()
         }

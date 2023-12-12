@@ -1,4 +1,5 @@
 <template>
+  <LoadingComponent :active="isloading"></LoadingComponent>
   <Navbar></Navbar>
   <div class="container-fluid">
     <router-view/>
@@ -8,6 +9,11 @@
 import Navbar from '../components/NavbarView.vue'
 
 export default {
+  data () {
+    return {
+      isloading: false
+    }
+  },
   components: {
     Navbar
   },
@@ -18,10 +24,10 @@ export default {
     console.log(token)
     this.$http.defaults.headers.common.Authorization = token
     const api = `${process.env.VUE_APP_API}api/user/check`
-    console.log(api)
+    this.isLoading = true
     this.$http.post(api, this.user)
       .then((res) => {
-        console.log(res)
+        this.isLoading = false
         if (!res.data.success) {
           this.$router.push('login')
         }
