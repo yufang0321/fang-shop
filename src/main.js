@@ -3,12 +3,17 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import App from './App.vue'
 import router from './router'
-// Import component
 import Loading from 'vue3-loading-overlay'
-// Import stylesheet
 import 'vue3-loading-overlay/dist/vue3-loading-overlay.css'
+import { currency } from './methods/filters'
 
 const app = createApp(App)
+// 全域用法
+// 如果全局属性與组件自己的属性衝突，组件自己的属性将具有更高的優先級
+// $filters為自己定義的，錢字號可加可不加
+app.config.globalProperties.$filters = {
+  currency
+}
 app.use(VueAxios, axios)
 app.use(router)
 app.component('LoadingComponent', Loading)
