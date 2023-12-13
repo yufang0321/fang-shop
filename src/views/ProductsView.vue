@@ -40,6 +40,8 @@
       </tr>
     </tbody>
   </table>
+  <PaginationView :pages="pagination"
+  @emit-pages="getProducts"></PaginationView>
   <ProductModal ref="productModal"
   :product="tempProduct"
   @update-product="updateProduct"></ProductModal>
@@ -52,6 +54,7 @@
 import ProductModal from '../components/ProductModal.vue'
 import DelModal from '../components/DelModal.vue'
 import LoadingComponent from 'vue3-loading-overlay'
+import PaginationView from '@/components/PaginationView.vue'
 
 export default {
   data () {
@@ -67,12 +70,13 @@ export default {
   components: {
     ProductModal,
     DelModal,
-    LoadingComponent
+    LoadingComponent,
+    PaginationView
   },
   inject: ['emitter'],
   methods: {
-    getProducts () {
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products`
+    getProducts (page = 1) {
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products?page=${page}`
       console.log(api)
       this.isLoading = true
       this.$http.get(api)
