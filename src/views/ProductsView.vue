@@ -47,6 +47,7 @@
   @update-product="updateProduct"></ProductModal>
   <DelModal ref="delModal"
   :item="delProduct"
+  :view="`delProduct`"
   @delete-product="deleteProduct"
   ></DelModal>
 </template>
@@ -77,7 +78,6 @@ export default {
   methods: {
     getProducts (page = 1) {
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products?page=${page}`
-      console.log(api)
       this.isLoading = true
       this.$http.get(api)
         .then((res) => {
@@ -99,7 +99,6 @@ export default {
       productComponent.showModal()
     },
     openDelModal (item) {
-      console.log('del:', item)
       this.delProduct = { ...item }
       const delComponent = this.$refs.delModal
       delComponent.showModal()
@@ -121,23 +120,26 @@ export default {
           this.isLoading = false
           console.log(response)
           productComponent.hideModal()
-          if (response.data.success) {
-            this.getProducts()
-            this.emitter.emit('push-message', {
-              style: 'success',
-              title: '更新成功'
-            })
-          } else {
-            this.emitter.emit('push-message', {
-              style: 'danger',
-              title: '更新失敗',
-              content: response.data.message.join('、')
-            })
-          }
+          this.getProducts()
+          this.$httpMessageState(response, '更新')
+          // if (response.data.success) {
+          //   this.emitter.emit('push-message', {
+          //     style: 'success',
+          //     title: '更新成功'
+          //   })
+          // } else {
+          //   this.$httpMessageState(response, '更新')
+          //   this.emitter.emit('push-message', {
+          //     style: 'danger',
+          //     title: '更新失敗',
+          //     content: response.data.message.join('、')
+          //   })
+          // }
         }
       )
     },
     deleteProduct (productId) {
+      console.log('delete product')
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${productId}`
       const delComponent = this.$refs.delModal
       this.isLoading = true

@@ -15,7 +15,7 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
             <button type="button"
             class="btn btn-danger"
-            @click="$emit('delete-product', item.id)"
+            @click="confirm"
             >確認刪除</button>
         </div>
         </div>
@@ -28,13 +28,25 @@ import modalMixin from '@/mixins/modalMixin'
 
 export default {
   props: {
-    item: {}
+    item: {},
+    view: {}
   },
   data () {
     return {
       modal: {}
     }
   },
-  mixins: [modalMixin]
+  mixins: [modalMixin],
+  methods: {
+    confirm () {
+      if (this.view === 'delProduct') {
+        this.$emit('delete-product', this.item.id)
+      } else if (this.view === 'delCoupon') {
+        this.$emit('del-coupon', this.item.id)
+      } else if (this.view === 'delOrder') {
+        this.$emit('delete-order', this.item.id)
+      }
+    }
+  }
 }
 </script>
