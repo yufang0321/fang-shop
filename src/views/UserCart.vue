@@ -1,5 +1,5 @@
 <template>
-    <Loading :active="isLoading"></Loading>
+    <LoadingComponent :active="isLoading"></LoadingComponent>
     <div class="container">
       <div class="row mt-4">
         <div class="col-md-7">
@@ -9,6 +9,7 @@
               <th>圖片</th>
               <th>商品名稱</th>
               <th>價格</th>
+              <th>數量</th>
               <th></th>
             </tr>
             </thead>
@@ -18,7 +19,7 @@
                 <div style="height: 100px; background-size: cover; background-position: center"
                      :style="{backgroundImage: `url(${item.imageUrl})`}"></div>
               </td>
-              <td><a href="#" class="text-dark">{{ item.title }}</a></td>
+              <td><a class="text-dark" @click="getProduct(item.id)">{{ item.title }}</a></td>
               <td>
                 <div class="h5" v-if="!item.price">{{ item.origin_price }} 元</div>
                 <del class="h6" v-if="item.price">原價 {{ item.origin_price }} 元</del>
@@ -31,7 +32,12 @@
                     查看更多
                   </button>
                   <button type="button" class="btn btn-outline-danger"
-                          >
+                          :disabled="this.status.loadingItem === item.id"
+                          @click="addCart(item.id)">
+                    <div v-if="this.status.loadingItem === item.id"
+                    class="spinner-grow text-danger spinner-grow-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
                     加到購物車
                   </button>
                 </div>
@@ -51,6 +57,7 @@ export default {
       products: [],
       product: {},
       status: {
+        // 對應品項id
         loadingItem: ''
       }
     }
@@ -67,6 +74,19 @@ export default {
     },
     getProduct (id) {
       this.$router.push(`/user/product/${id}`)
+    },
+    addCart (productId) {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart`
+      this.status.loadingItem = productId
+      const cart = {
+        product_id: productId,
+        qty: 1
+      }
+      this.$http.post(url, { data: cart }).then((response) => {
+        this.status.loadingItem = ''
+        console.log(response)
+      })
+      console.log(productId)
     }
   },
   created () {
