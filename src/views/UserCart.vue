@@ -73,7 +73,12 @@
                 <div class="h5">{{ item.product.price }} 元</div>
               </td>
               <td>
-                <div class="h5">{{ item.qty }}</div>
+                <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+                  <div class="btn-group" role="group" aria-label="First group">
+                    <input type="number" min="1" @change="updateCart(item)"
+                    :disabled="item.id === status.loadingItem" class="form-control" v-model="item.qty">
+                  </div>
+                </div>
               </td>
               <td>
                 <button type="button" class="btn btn-outline-danger" @click="deleteProduct(item.id)">
@@ -154,6 +159,19 @@ export default {
       const deleteOneUrl = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart/${productId}`
       this.$http.delete(deleteOneUrl).then((response) => {
         this.$httpMessageState(response, '刪除')
+        this.getCart()
+      })
+    },
+    updateCart (item) {
+      const updateCartUrl = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart/${item.id}`
+      this.status.loadingItem = item.id
+      const cart = {
+        product_id: item.id,
+        qty: item.qty
+      }
+      this.$http.put(updateCartUrl, { data: cart }).then((response) => {
+        console.log(response.data)
+        this.status.loadingItem = ''
         this.getCart()
       })
     }

@@ -21,7 +21,7 @@
         <hr>
         <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
           <div class="btn-group" role="group" aria-label="First group">
-            <button type="button" class="btn btn-outline-secondary" @click="deleteQty(product)">-</button>
+            <button type="button" min="1" class="btn btn-outline-secondary" @click="deleteQty(product)">-</button>
             <input type="number" class="form-control" v-model="product.qty">
             <button type="button" class="btn btn-outline-secondary" @click="addQty(product)">+</button>
           </div>
