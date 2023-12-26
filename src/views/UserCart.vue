@@ -67,29 +67,41 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="item in carts" :key="item.id">
-              <td><a class="h5">{{ item.product.title }}</a></td>
-              <td>
-                <div class="h5">{{ item.product.price }} 元</div>
-              </td>
-              <td>
-                <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-                  <div class="btn-group" role="group" aria-label="First group">
-                    <input type="number" min="1" @change="updateCart(item)"
-                    :disabled="item.id === status.loadingItem" class="form-control" v-model="item.qty">
+              <tr v-for="item in carts" :key="item.id">
+                <td><a class="h5">{{ item.product.title }}</a></td>
+                <td>
+                  <div class="h5">{{ item.product.price }} 元</div>
+                </td>
+                <td>
+                  <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+                    <div class="btn-group" role="group" aria-label="First group">
+                      <input type="number" min="1" @change="updateCart(item)"
+                      :disabled="item.id === status.loadingItem" class="form-control" v-model="item.qty">
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <button type="button" class="btn btn-outline-danger" @click="deleteProduct(item.id)">
-                  <i class="bi bi-trash3"></i>
-                </button>
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-outline-danger" @click="deleteProduct(item.id)">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </td>
+              </tr>
             </tbody>
+            <div>
+              <p class="text-end h5" v-if="onDiscount === true" style="color: #42b840">已套用折扣</p>
+            </div>
           </table>
           <div>
-            <p class="text-end h5">總計：{{ order.final_total }}</p>
+            <p class="text-end h5">總計：{{ order.total }}</p>
+          </div>
+          <div>
+            <p class="text-end h5" v-if="onDiscount === true" style="color: #42b840">折扣後價格：{{ order.final_total }}</p>
+          </div>
+          <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="請輸入優惠碼" v-model="coupon">
+              <button type="button" @click="addCoupon()" class="btn btn-outline-secondary">套用優惠券</button>
+            </div>
           </div>
         </div>
       </div>
@@ -105,8 +117,10 @@ export default {
       order: {},
       status: {
         // 對應品項id
-        loadingItem: ''
-      }
+        loadingItem: '',
+        onDiscount: false
+      },
+      coupon: ''
     }
   },
   methods: {
@@ -173,6 +187,23 @@ export default {
         console.log(response.data)
         this.status.loadingItem = ''
         this.getCart()
+      })
+    },
+    addCoupon () {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/coupon`
+      const data = {
+        code: this.coupon
+      }
+      this.$http.post(url, { data: data }).then((response) => {
+        console.log(response)
+        if (response.data.success) {
+          this.getCart()
+          this.onDiscount = true
+          this.coupon = ''
+          this.$httpMessageState(response)
+        } else {
+          this.$httpMessageState(response)
+        }
       })
     }
   },
