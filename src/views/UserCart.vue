@@ -26,6 +26,15 @@
                 <div class="h5" v-if="item.price">現在只要 {{ item.price }} 元</div>
               </td>
               <td>
+                <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+                  <div class="btn-group" role="group" aria-label="First group">
+                    <button type="button" class="btn btn-outline-secondary" @click="deleteQty(item)">-</button>
+                    <input type="number" class="form-control" v-model="item.qty">
+                    <button type="button" class="btn btn-outline-secondary" @click="addQty(item)">+</button>
+                  </div>
+                </div>
+              </td>
+              <td>
                 <div class="btn-group btn-group-sm">
                   <button type="button" class="btn btn-outline-secondary"
                           @click="getProduct(item.id)">
@@ -33,7 +42,7 @@
                   </button>
                   <button type="button" class="btn btn-outline-danger"
                           :disabled="this.status.loadingItem === item.id"
-                          @click="addCart(item.id)">
+                          @click="addCart(item.id, item.qty)">
                     <div v-if="this.status.loadingItem === item.id"
                     class="spinner-grow text-danger spinner-grow-sm" role="status">
                       <span class="visually-hidden">Loading...</span>
@@ -67,26 +76,38 @@ export default {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/products/all`
       this.isLoading = true
       this.$http.get(url).then((response) => {
-        this.products = response.data.products
-        console.log('products:', response)
+        this.products =
+        response.data.products.filter((product, index, arr) => {
+          product.qty = 0
+          return product
+        })
+        console.log('products:', this.products)
         this.isLoading = false
       })
     },
     getProduct (id) {
       this.$router.push(`/user/product/${id}`)
     },
-    addCart (productId) {
+    addCart (productId, productQty) {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart`
       this.status.loadingItem = productId
       const cart = {
         product_id: productId,
-        qty: 1
+        qty: productQty
       }
       this.$http.post(url, { data: cart }).then((response) => {
         this.status.loadingItem = ''
         console.log(response)
       })
-      console.log(productId)
+      console.log('item.id:', productId, 'item.qty:', productQty)
+    },
+    addQty (product) {
+      product.qty += 1
+    },
+    deleteQty (product) {
+      if (product.qty > 0) {
+        product.qty -= 1
+      }
     }
   },
   created () {

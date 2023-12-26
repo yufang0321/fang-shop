@@ -19,8 +19,15 @@
         <del class="h6" v-if="product.price">原價 {{ product.origin_price }} 元</del>
         <div class="h5" v-if="product.price">現在只要 {{ product.price }} 元</div>
         <hr>
+        <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group" role="group" aria-label="First group">
+            <button type="button" class="btn btn-outline-secondary" @click="deleteQty(product)">-</button>
+            <input type="number" class="form-control" v-model="product.qty">
+            <button type="button" class="btn btn-outline-secondary" @click="addQty(product)">+</button>
+          </div>
+        </div>
         <button type="button" class="btn btn-outline-danger"
-                @click="addToCart(product.id)">
+                @click="addToCart(product)">
           加到購物車
         </button>
       </div>
@@ -43,22 +50,31 @@ export default {
         console.log(response.data)
         this.isLoading = false
         if (response.data.success) {
-          this.product = response.data.product
+          this.product = { ...response.data.product, qty: 1 }
         }
       })
     },
-    addToCart (id, qty = 1) {
+    addToCart (product) {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart`
+      console.log('product123:', product)
       const cart = {
-        product_id: id,
-        qty
+        product_id: product.id,
+        qty: product.qty
       }
       this.isLoading = true
       this.$http.post(url, { data: cart }).then((response) => {
         this.isLoading = false
         this.$httpMessageState(response, '加入購物車')
-        this.$router.push('/user/cart')
+        // this.$router.push('/user/cart')
       })
+    },
+    addQty (product) {
+      product.qty += 1
+    },
+    deleteQty (product) {
+      if (product.qty > 1) {
+        product.qty -= 1
+      }
     }
   },
   created () {
