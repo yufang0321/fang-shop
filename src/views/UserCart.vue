@@ -38,7 +38,7 @@
                 <div class="btn-group btn-group-sm">
                   <button type="button" class="btn btn-outline-secondary"
                           @click="getProduct(item.id)">
-                    查看更多
+                    <i class="bi bi-three-dots"></i>
                   </button>
                   <button type="button" class="btn btn-outline-danger"
                           :disabled="this.status.loadingItem === item.id"
@@ -47,7 +47,7 @@
                     class="spinner-grow text-danger spinner-grow-sm" role="status">
                       <span class="visually-hidden">Loading...</span>
                     </div>
-                    加到購物車
+                    <i class="bi bi-cart-plus"></i>
                   </button>
                 </div>
               </td>
@@ -56,6 +56,37 @@
           </table>
         </div>
         <!-- 購物車列表 -->
+        <div class="col-md-5">
+          <table class="table align-middle">
+            <thead>
+            <tr>
+              <th>品名</th>
+              <th>單價</th>
+              <th>數量</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in carts" :key="item.id">
+              <td><a class="h5">{{ item.product.title }}</a></td>
+              <td>
+                <div class="h5">{{ item.product.price }} 元</div>
+              </td>
+              <td>
+                <div class="h5">{{ item.qty }}</div>
+              </td>
+              <td>
+                <button type="button" class="btn btn-outline-danger" @click="deleteProduct(item.id)">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <div>
+            <p class="text-end h5">總計：{{ order.final_total }}</p>
+          </div>
+        </div>
       </div>
     </div>
   </template>
@@ -65,6 +96,8 @@ export default {
     return {
       products: [],
       product: {},
+      carts: [],
+      order: {},
       status: {
         // 對應品項id
         loadingItem: ''
@@ -93,11 +126,11 @@ export default {
       this.status.loadingItem = productId
       const cart = {
         product_id: productId,
-        qty: productQty
+        qty: productQty === 0 ? 1 : productQty
       }
       this.$http.post(url, { data: cart }).then((response) => {
         this.status.loadingItem = ''
-        console.log(response)
+        this.getCart()
       })
       console.log('item.id:', productId, 'item.qty:', productQty)
     },
@@ -108,10 +141,26 @@ export default {
       if (product.qty > 0) {
         product.qty -= 1
       }
+    },
+    getCart () {
+      const getCartUrl = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart`
+      this.$http.get(getCartUrl).then((response) => {
+        console.log('getCart:', response.data.data)
+        this.carts = response.data.data.carts
+        this.order = response.data.data
+      })
+    },
+    deleteProduct (productId) {
+      const deleteOneUrl = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart/${productId}`
+      this.$http.delete(deleteOneUrl).then((response) => {
+        this.$httpMessageState(response, '刪除')
+        this.getCart()
+      })
     }
   },
   created () {
     this.getProducts()
+    this.getCart()
   }
 }
 </script>
