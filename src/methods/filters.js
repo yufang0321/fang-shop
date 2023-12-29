@@ -8,3 +8,8 @@ export function date (time) {
   const localDate = new Date(time * 1000)
   return localDate.toLocaleDateString()
 }
+// 無條件進位
+export function round (num) {
+  const roundNum = Math.round(num)
+  return roundNum
+}

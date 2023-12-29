@@ -95,7 +95,7 @@
             <p class="text-end h5">總計：{{ order.total }}</p>
           </div>
           <div>
-            <p class="text-end h5" v-if="onDiscount === true" style="color: #42b840">折扣後價格：{{ order.final_total }}</p>
+            <p class="text-end h5" v-if="onDiscount === true" style="color: #42b840">折扣後價格：{{ $filters.round(order.final_total) }}</p>
           </div>
           <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
             <div class="input-group">

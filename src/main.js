@@ -7,7 +7,7 @@ import Loading from 'vue3-loading-overlay'
 import 'vue3-loading-overlay/dist/vue3-loading-overlay.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
-import { currency, date } from './methods/filters'
+import { currency, date, round } from './methods/filters'
 import $httpMessageState from './methods/pushMessageState'
 
 const app = createApp(App)
@@ -16,7 +16,8 @@ const app = createApp(App)
 // $filters為自己定義的，錢字號可加可不加
 app.config.globalProperties.$filters = {
   currency,
-  date
+  date,
+  round
 }
 app.config.globalProperties.$httpMessageState = $httpMessageState
 
