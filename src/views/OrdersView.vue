@@ -3,9 +3,9 @@
   <table class="table mt-4">
     <thead>
       <tr>
-        <th width="200">購買時間</th>
-        <th width="200">Email</th>
-        <th width="120">購買款項</th>
+        <th width="120">購買時間</th>
+        <th width="120">Email</th>
+        <th width="200">購買款項</th>
         <th width="120">應付金額</th>
         <th width="100">是否付款</th>
         <th width="200">編輯</th>
@@ -13,10 +13,15 @@
     </thead>
     <tbody>
       <tr v-for="item in orders" :key="item.id">
-        <td>{{ item.create_at }}</td>
+        <td>{{ $filters.date(item.create_at) }}</td>
         <td>{{ item.user.email }}</td>
-        <td v-for="stuff in item.products" :key="stuff.id" class="text-right">
-          `{{ stuff.id }} ： {{ stuff.qty }}`
+        <td>
+          <ul class="list-unstyled">
+            <li v-for="(product, i) in item.products" :key="i">
+              {{ product.product.title }} 數量：{{ product.qty }}
+              {{ product.product.unit }}
+            </li>
+          </ul>
         </td>
         <td class="text-right">
           {{ item.total }}
@@ -79,7 +84,7 @@ export default {
           this.isLoading = false
           console.log('orders:', res)
           if (res.data.success) {
-            this.orders = res.data.products
+            this.orders = res.data.orders
             this.pagination = res.data.pagination
           }
         })
@@ -97,7 +102,7 @@ export default {
     updateOrder (item) {
       this.tempProduct = item
       // 修改訂單
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${item.id}`
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/order/${item.id}`
       const orderComponent = this.$refs.orderModal
       this.isLoading = true
       this.$http.put(api, { data: this.tempOrder }).then(
@@ -111,7 +116,7 @@ export default {
       )
     },
     deleteOrder (productId) {
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${productId}`
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/order/${productId}`
       const delComponent = this.$refs.delModal
       this.isLoading = true
       this.$http.delete(api).then(

@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">GOGO露營趣</a>
+      <a class="navbar-brand" href="#">管理者介面</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -20,9 +20,6 @@
             <a class="nav-link" href="#" @click.prevent="logout">登出</a>
           </li>
         </ul>
-        <span class="navbar-text">
-          管理者介面
-        </span>
       </div>
     </div>
   </nav>

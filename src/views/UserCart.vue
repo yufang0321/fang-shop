@@ -29,7 +29,7 @@
                 <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
                   <div class="btn-group" role="group" aria-label="First group">
                     <button type="button" class="btn btn-outline-secondary" @click="deleteQty(item)">-</button>
-                    <input type="number" class="form-control" v-model="item.qty">
+                    <input type="number" min="1" class="form-control" v-model="item.qty">
                     <button type="button" class="btn btn-outline-secondary" @click="addQty(item)">+</button>
                   </div>
                 </div>
@@ -106,6 +106,46 @@
         </div>
       </div>
     </div>
+    <div class="my-5 row justify-content-center">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input id="email" name="email" type="email" class="form-control"
+                  placeholder="請輸入 Email" rules="email|required"
+                  v-model="form.user.email">
+        </div>
+
+        <div class="mb-3">
+          <label for="name" class="form-label">收件人姓名</label>
+          <input id="name" name="姓名" type="text" class="form-control"
+                  placeholder="請輸入姓名" rules="required"
+                  v-model="form.user.name">
+        </div>
+
+        <div class="mb-3">
+          <label for="tel" class="form-label">收件人電話</label>
+          <input id="tel" name="電話" type="tel" class="form-control"
+                  placeholder="請輸入電話" rules="required"
+                  v-model="form.user.tel">
+        </div>
+
+        <div class="mb-3">
+          <label for="address" class="form-label">收件人地址</label>
+          <input id="address" name="地址" type="text" class="form-control"
+                  placeholder="請輸入地址" rules="required"
+                  v-model="form.user.address">
+        </div>
+
+        <div class="mb-3">
+          <label for="message" class="form-label">留言</label>
+          <textarea name="" id="message" class="form-control" cols="30" rows="10"
+                    v-model="form.message"></textarea>
+        </div>
+        <div class="text-end">
+          <button class="btn btn-danger" @click.prevent="createOrder()">送出訂單</button>
+        </div>
+      </div>
+    </div>
   </template>
 <script>
 export default {
@@ -120,7 +160,16 @@ export default {
         loadingItem: '',
         onDiscount: false
       },
-      coupon: ''
+      coupon: '',
+      form: {
+        user: {
+          name: '',
+          email: '',
+          tel: '',
+          address: ''
+        },
+        message: ''
+      }
     }
   },
   methods: {
@@ -130,7 +179,7 @@ export default {
       this.$http.get(url).then((response) => {
         this.products =
         response.data.products.filter((product, index, arr) => {
-          product.qty = 0
+          product.qty = 1
           return product
         })
         console.log('products:', this.products)
@@ -157,7 +206,7 @@ export default {
       product.qty += 1
     },
     deleteQty (product) {
-      if (product.qty > 0) {
+      if (product.qty > 1) {
         product.qty -= 1
       }
     },
@@ -205,6 +254,14 @@ export default {
           this.$httpMessageState(response)
         }
       })
+    },
+    createOrder () {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/order`
+      const order = this.form
+      this.$http.post(url, { data: order })
+        .then((res) => {
+          console.log('createOrder------>', res)
+        })
     }
   },
   created () {

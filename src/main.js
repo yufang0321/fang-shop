@@ -19,6 +19,7 @@ app.config.globalProperties.$filters = {
   date
 }
 app.config.globalProperties.$httpMessageState = $httpMessageState
+
 app.use(VueAxios, axios)
 app.use(router)
 app.component('LoadingComponent', Loading)
