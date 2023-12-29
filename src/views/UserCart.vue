@@ -261,6 +261,7 @@ export default {
       this.$http.post(url, { data: order })
         .then((res) => {
           console.log('createOrder------>', res)
+          this.$router.push(`/user/checkout/${res.data.orderId}`)
         })
     }
   },
